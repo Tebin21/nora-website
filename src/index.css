@@ -1,0 +1,286 @@
+@import "tailwindcss";
+
+/* =========================================================
+   BAHIJ FONT FAMILY (Kurdish & Arabic) + BATICA (English)
+   ========================================================= */
+@font-face {
+  font-family: "Bahij";
+  src:
+    url("/fonts/BahijJanna-Regular.woff2") format("woff2"),
+    url("/fonts/BahijJanna-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bahij";
+  src:
+    url("/fonts/BahijJanna-Regular.woff2") format("woff2"),
+    url("/fonts/BahijJanna-Regular.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bahij";
+  src:
+    url("/fonts/BahijJanna-Bold.woff2") format("woff2"),
+    url("/fonts/BahijJanna-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bahij";
+  src:
+    url("/fonts/BahijJanna-Bold.woff2") format("woff2"),
+    url("/fonts/BahijJanna-Bold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Batica";
+  src: url("/fonts/baticasans-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Batica";
+  src: url("/fonts/baticasans-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-bahij: "Bahij", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-en: "Batica", "Bahij", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-bahij);
+  background-color: #06070b;
+  color: #f8fafc;
+}
+
+html[lang="ku"],
+html[lang="ar"] {
+  font-family: var(--font-bahij);
+}
+
+html[lang="en"] {
+  font-family: var(--font-en);
+}
+
+body {
+  font-family: inherit;
+  background-color: #06070b;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   MOLTEN METAL & WEB THREADS BACKGROUND CANVAS
+   ========================================================= */
+.molten-metal-container,
+.web-threads-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.molten-metal-canvas,
+.web-threads-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================
+   FROSTED GLASS (.Frostedglass) & LIQUID GLASS ARCHITECTURE
+   ========================================================= */
+
+.Frostedglass {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 12px 36px 0 rgba(0, 0, 0, 0.42),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Main Liquid Glass Navigation Shell */
+.liquid-glass-shell {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+  backdrop-filter: blur(32px) saturate(210%) contrast(104%);
+  -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(104%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 20px 50px -12px rgba(0, 0, 0, 0.68),
+    0 4px 20px -2px rgba(245, 158, 11, 0.08),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.12),
+    inset 1px 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset -1px 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Dynamic Specular Reflection Layer Inside Liquid Glass */
+.liquid-glass-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.08) 32%,
+    rgba(251, 191, 36, 0.25) 68%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Liquid Glass Active Morphing Pill */
+.liquid-glass-pill {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.24) 0%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 6px 20px -4px rgba(0, 0, 0, 0.45),
+    0 0 18px -2px rgba(245, 158, 11, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Liquid Glass Recessed Track (for Language Switcher & Tabs) */
+.liquid-glass-well {
+  background: rgba(6, 8, 14, 0.42);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.16);
+}
+
+/* Liquid Glass Surface Cards */
+.liquid-glass-card {
+  position: relative;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.03) 55%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.liquid-glass-card:hover {
+  border-color: rgba(251, 191, 36, 0.32);
+  box-shadow:
+    0 28px 60px -12px rgba(0, 0, 0, 0.65),
+    0 0 32px -6px rgba(245, 158, 11, 0.14),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1px rgba(251, 191, 36, 0.15);
+}
+
+/* Liquid Gold CTA Button */
+.liquid-gold-btn {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.92) 0%,
+    rgba(245, 158, 11, 0.88) 50%,
+    rgba(217, 119, 6, 0.92) 100%
+  );
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(254, 243, 199, 0.55);
+  box-shadow:
+    0 10px 28px -6px rgba(245, 158, 11, 0.55),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(146, 64, 14, 0.45);
+  color: #090a0f;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.liquid-gold-btn:hover {
+  transform: translateY(-1.5px) scale(1.015);
+  box-shadow:
+    0 14px 34px -4px rgba(245, 158, 11, 0.7),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(146, 64, 14, 0.45);
+}
+
+/* Subtle animated liquid sheen */
+@keyframes liquidFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.animate-liquid-float {
+  animation: liquidFloat 6s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #06070b;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
+}
