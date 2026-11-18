@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import {
   CalendarRange,
@@ -15,6 +15,19 @@ interface ProviderShowcaseProps {
 export const ProviderShowcase: React.FC<ProviderShowcaseProps> = ({ t }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const features = [
     {
@@ -43,14 +56,15 @@ export const ProviderShowcase: React.FC<ProviderShowcaseProps> = ({ t }) => {
     },
   ];
 
-  // Auto-advance every 4 seconds
+  // Auto-advance every 4 seconds only when visible in viewport
   useEffect(() => {
+    if (!isVisible) return;
     const timer = setInterval(() => {
       setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % features.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [features.length, currentIndex]);
+  }, [features.length, currentIndex, isVisible]);
 
   const handleDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
@@ -70,7 +84,7 @@ export const ProviderShowcase: React.FC<ProviderShowcaseProps> = ({ t }) => {
   const ActiveIcon = activeFeature.icon;
 
   return (
-    <section id="providers" className="relative py-20 overflow-hidden">
+    <section ref={sectionRef} id="providers" className="relative py-20 overflow-hidden">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Top / First: Heading + Auto-Sliding & Draggable Feature Card */}
@@ -152,9 +166,13 @@ export const ProviderShowcase: React.FC<ProviderShowcaseProps> = ({ t }) => {
           >
             <div className="relative w-full max-w-[460px] sm:max-w-[520px] flex items-center justify-center overflow-visible">
               <img
-                src="/assets/mockup-provider.png"
+                src="/assets/mockup-provider.webp"
                 alt="NORA Provider Schedule & IQD Revenue Dashboard"
-                className="w-full h-auto object-contain drop-shadow-[0_35px_65px_rgba(0,0,0,0.9)] scale-[1.45] sm:scale-[1.32] select-none pointer-events-none"
+                width={1400}
+                height={1050}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto object-contain drop-shadow-[0_22px_32px_rgba(0,0,0,0.85)] scale-[1.45] sm:scale-[1.32] select-none pointer-events-none"
               />
             </div>
           </motion.div>

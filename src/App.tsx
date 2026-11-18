@@ -42,17 +42,17 @@ export function App() {
       dir={t.dir}
       className="min-h-screen bg-[#05060a] text-slate-100 relative selection:bg-amber-500/30 selection:text-amber-200"
     >
-      {/* Full-Screen WebGL2 MoltenMetal Motion Background (Softly Blurred) */}
+      {/* Full-Screen WebGL2 MoltenMetal Motion Background (Hardware-Softened Low-DPR) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 overflow-hidden blur-[22px] sm:blur-[30px] opacity-60"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-60"
       >
         <MoltenMetal
           colors={['#475569', '#CBD5E1']}
           coreColor="#FFFFFF"
           speed={0.28}
           scale={3.8}
-          detail={3}
+          detail={2}
           glow={1.4}
           thickness={1}
           swirl={1}
@@ -60,11 +60,12 @@ export function App() {
           haze={0.75}
           brightness={1.1}
           colorMode="frost"
+          grain={0}
           opacity={0.75}
-          intro={true}
-          mouseInteraction={true}
-          mouseStrength={0.45}
-          flareOnClick={true}
+          dpr={0.22}
+          intro={false}
+          mouseInteraction={false}
+          flareOnClick={false}
         />
       </div>
 

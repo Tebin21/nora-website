@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Target,
@@ -207,22 +207,36 @@ export const BeforeAfterSplit: React.FC<BeforeAfterSplitProps> = ({
   lang = 'ku',
 }) => {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const data = MISSION_DATA[lang] || MISSION_DATA.ku;
 
-  // Auto-cycle through the 3 mission pillars every 5.5 seconds
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Auto-cycle through the 3 mission pillars every 5.5 seconds only when visible
+  useEffect(() => {
+    if (!isVisible) return;
     const timer = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % data.pillars.length);
     }, 5500);
     return () => clearInterval(timer);
-  }, [data.pillars.length]);
+  }, [data.pillars.length, isVisible]);
 
   const activePillar = data.pillars[activeIdx];
 
   const pillarIcons = [Target, UserCheck, Users];
 
   return (
-    <section id="story" className="relative py-20 sm:py-24 overflow-hidden">
+    <section ref={sectionRef} id="story" className="relative py-20 sm:py-24 overflow-hidden">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -245,24 +259,24 @@ export const BeforeAfterSplit: React.FC<BeforeAfterSplitProps> = ({
             <div className="bg-[#0d0f14] border border-zinc-800 rounded-[28px] p-6 sm:p-8 relative overflow-hidden shadow-2xl">
               {/* Animated Orbital Rings */}
               <div className="relative h-64 sm:h-72 flex items-center justify-center">
-                {/* Outer Rotating Ring */}
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-                  className="absolute h-56 w-56 sm:h-64 sm:w-64 rounded-full border border-dashed border-zinc-700"
+                {/* Outer Rotating Ring (GPU-composited CSS spin) */}
+                <div
+                  className={`absolute h-56 w-56 sm:h-64 sm:w-64 rounded-full border border-dashed border-zinc-700 animate-[spin_28s_linear_infinite] ${
+                    isVisible ? '' : '[animation-play-state:paused]'
+                  }`}
                 >
                   <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 h-3 w-3 rounded-full bg-amber-400" />
                   <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-zinc-300" />
-                </motion.div>
+                </div>
 
-                {/* Middle Counter-Rotating Ring */}
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute h-40 w-40 sm:h-44 sm:w-44 rounded-full border border-amber-500/35"
+                {/* Middle Counter-Rotating Ring (GPU-composited CSS spin) */}
+                <div
+                  className={`absolute h-40 w-40 sm:h-44 sm:w-44 rounded-full border border-amber-500/35 animate-[spin_20s_linear_infinite_reverse] ${
+                    isVisible ? '' : '[animation-play-state:paused]'
+                  }`}
                 >
                   <div className="absolute top-1/2 -start-1.5 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                </motion.div>
+                </div>
 
                 {/* Center NORA Logo Only (No box or label) */}
                 <div className="relative z-10 flex items-center justify-center">

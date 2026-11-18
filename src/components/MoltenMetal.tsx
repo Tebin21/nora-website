@@ -141,7 +141,7 @@ void main() {
     i -= p + vec2(cos(t - i.x - r) + sin(t + i.y), sin(t - i.y) + cos(t + i.x) + r);
     float l = length(vec2(sin(i.x + t), cos(i.y + t)));
     float footprint = 0.5 * length(vec2(dFdx(l), dFdy(l)));
-    l = sqrt(l * l + footprint * footprint);
+    l = sqrt(l * l + footprint * footprint + 0.022);
     float weight = clamp(uDetail - n, 0.0, 1.0);
     c += weight * uGlow / (power == 1.0 ? l : pow(max(l, 1e-6), power));
     if (uReveal.y > 0.5) blurred += weight * uGlow / sqrt(l * l + 0.0025);
@@ -307,7 +307,7 @@ export default function MoltenMetal({
     mouseStrength: clamp(mouseStrength, 0, 1),
     flareOnClick,
     paused,
-    dpr: Math.max(0.5, dpr),
+    dpr: clamp(dpr, 0.15, 2),
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -401,6 +401,10 @@ export default function MoltenMetal({
     const state = {
       width: 1,
       height: 1,
+      rectLeft: 0,
+      rectTop: 0,
+      rectWidth: 1,
+      rectHeight: 1,
       isMobile: false,
       time: FLOW_START,
       clock: 0,
@@ -420,10 +424,15 @@ export default function MoltenMetal({
 
     const resize = () => {
       const s = settingsRef.current;
-      const clientW = container.clientWidth || window.innerWidth;
-      const clientH = container.clientHeight || window.innerHeight;
+      const rect = container.getBoundingClientRect();
+      const clientW = rect.width || window.innerWidth;
+      const clientH = rect.height || window.innerHeight;
+      state.rectLeft = rect.left;
+      state.rectTop = rect.top;
+      state.rectWidth = Math.max(clientW, 1);
+      state.rectHeight = Math.max(clientH, 1);
       state.isMobile = clientW < 768;
-      const maxDpr = state.isMobile ? Math.min(s.dpr, 1.5) : s.dpr;
+      const maxDpr = state.isMobile ? Math.min(s.dpr, 0.35) : s.dpr;
       const ratio = Math.min(window.devicePixelRatio || 1, maxDpr);
       const width = Math.max(1, Math.round(clientW * ratio));
       const height = Math.max(1, Math.round(clientH * ratio));
@@ -543,6 +552,10 @@ export default function MoltenMetal({
         state.last = now;
         return;
       }
+      // Throttle ambient shader to ~30fps to save massive GPU/battery with zero visual difference
+      if (state.last && now - state.last < 32) {
+        return;
+      }
       const s = settingsRef.current;
       const dt = state.last ? Math.min((now - state.last) / 1000, 0.1) : 0;
       state.last = now;
@@ -569,20 +582,18 @@ export default function MoltenMetal({
       state.seen = s;
       if (state.quiet > 3) return;
 
-      resize();
       render(reduced);
     };
 
     const local = (event: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
       return {
-        x: (event.clientX - rect.left) / Math.max(rect.width, 1),
-        y: (event.clientY - rect.top) / Math.max(rect.height, 1),
+        x: (event.clientX - state.rectLeft) / state.rectWidth,
+        y: (event.clientY - state.rectTop) / state.rectHeight,
         inside:
-          event.clientX >= rect.left &&
-          event.clientX <= rect.right &&
-          event.clientY >= rect.top &&
-          event.clientY <= rect.bottom,
+          event.clientX >= state.rectLeft &&
+          event.clientX <= state.rectLeft + state.rectWidth &&
+          event.clientY >= state.rectTop &&
+          event.clientY <= state.rectTop + state.rectHeight,
       };
     };
 
@@ -616,12 +627,17 @@ export default function MoltenMetal({
     visibility.observe(container);
     const sizes = new ResizeObserver(() => {
       state.quiet = 0;
+      resize();
     });
     sizes.observe(container);
     resize();
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerdown', onDown, { passive: true });
-    document.documentElement.addEventListener('pointerleave', onLeave);
+    if (settingsRef.current.mouseInteraction) {
+      window.addEventListener('pointermove', onMove, { passive: true });
+      document.documentElement.addEventListener('pointerleave', onLeave);
+    }
+    if (settingsRef.current.flareOnClick) {
+      window.addEventListener('pointerdown', onDown, { passive: true });
+    }
     state.raf = requestAnimationFrame(tick);
 
     return () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scissors,
@@ -459,14 +459,27 @@ export const BookingSimulator: React.FC<BookingSimulatorProps> = ({ t, lang }) =
   const [selectedSpec, setSelectedSpec] = useState<SpecialistItem>(DEMO_SPECIALISTS[0]);
   const [selectedService, setSelectedService] = useState<ServiceItem>(DEMO_SPECIALISTS[0].services[0]);
   const [selectedTime, setSelectedTime] = useState<string>('04:30 PM');
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const labels = STEP_LABELS[lang] || STEP_LABELS.ku;
   const isRtl = lang !== 'en';
   const BackArrow = isRtl ? ArrowRight : ArrowLeft;
 
-  // Automatically cycle category every 5 seconds when on step 1
   useEffect(() => {
-    if (step !== 1) return;
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Automatically cycle category every 5 seconds when on step 1 and visible
+  useEffect(() => {
+    if (step !== 1 || !isVisible) return;
     const order: ('barber' | 'salon' | 'nails')[] = ['barber', 'salon', 'nails'];
     const timer = setInterval(() => {
       setCategoryFilter((prev) => {
@@ -475,7 +488,7 @@ export const BookingSimulator: React.FC<BookingSimulatorProps> = ({ t, lang }) =
       });
     }, 5000);
     return () => clearInterval(timer);
-  }, [step, categoryFilter]);
+  }, [step, categoryFilter, isVisible]);
 
   const filteredSpecialists = DEMO_SPECIALISTS.filter(
     (s) => s.category === categoryFilter
@@ -503,6 +516,10 @@ export const BookingSimulator: React.FC<BookingSimulatorProps> = ({ t, lang }) =
         <img
           src={spec.image}
           alt={spec.name[lang]}
+          width={56}
+          height={56}
+          loading="lazy"
+          decoding="async"
           className="h-14 w-14 rounded-2xl object-cover object-top border border-zinc-700 shrink-0"
         />
       );
@@ -522,7 +539,7 @@ export const BookingSimulator: React.FC<BookingSimulatorProps> = ({ t, lang }) =
   };
 
   return (
-    <section id="simulator" className="relative py-20 overflow-hidden">
+    <section ref={sectionRef} id="simulator" className="relative py-20 overflow-hidden">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">

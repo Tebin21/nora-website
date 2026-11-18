@@ -74,13 +74,18 @@ export const LiquidGlassNav: React.FC<LiquidGlassNavProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [legalModal, setLegalModal] = useState<'privacy' | 'terms' | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50, active: false });
   const navRef = useRef<HTMLDivElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let lastScrolled = window.scrollY > 20;
+    setScrolled(lastScrolled);
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const nextScrolled = window.scrollY > 20;
+      if (nextScrolled !== lastScrolled) {
+        lastScrolled = nextScrolled;
+        setScrolled(nextScrolled);
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -97,11 +102,18 @@ export const LiquidGlassNav: React.FC<LiquidGlassNavProps> = ({
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!navRef.current) return;
-    const rect = navRef.current.getBoundingClientRect();
+    const el = navRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y, active: true });
+    el.style.background = `radial-gradient(360px circle at ${x}% ${y}%, rgba(255, 255, 255, 0.14), transparent 70%), linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.07) 100%)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (navRef.current) {
+      navRef.current.style.background = '';
+    }
   };
 
   // Exact 6 links matching the user's screenshot order:
@@ -143,18 +155,13 @@ export const LiquidGlassNav: React.FC<LiquidGlassNavProps> = ({
         <motion.div
           ref={navRef}
           onMouseMove={handleMouseMove}
-          onMouseLeave={() => setMousePos((prev) => ({ ...prev, active: false }))}
+          onMouseLeave={handleMouseLeave}
           initial={{ y: -32, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 260, damping: 26 }}
           className={`Frostedglass pointer-events-auto mx-auto max-w-[1080px] rounded-full transition-all duration-500 relative ${
             scrolled ? 'py-2 px-3 sm:px-5' : 'py-2.5 px-3.5 sm:px-5'
           }`}
-          style={{
-            background: mousePos.active
-              ? `radial-gradient(360px circle at ${mousePos.x}% ${mousePos.y}%, rgba(255, 255, 255, 0.14), transparent 70%), linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.07) 100%)`
-              : undefined,
-          }}
         >
           {/* Subtle top specular glass reflection line */}
           <div className="pointer-events-none absolute inset-x-10 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/45 to-transparent" />
